@@ -14,12 +14,12 @@ LR = 0.00008                 # learning rate
 EPSILON = 0.98               # greedy policy
 GAMMA = 0.9                  # reward discount
 TARGET_REPLACE_ITER = 4000   # target update frequency
-MEMORY_LONG_CAPACITY = 2000
-MEMORY_SELF_CAPACITY = 1000 # shared by D_short and D_self
+MEMORY_LONG_CAPACITY = 200000
+MEMORY_SELF_CAPACITY = 100000 # shared by D_short and D_self
 DAGGER_EPOCH=1
 DAGGER_ITER=4
 DAGGER_LEARN=4000
-RL_EPOCH=1000
+RL_EPOCH=2000
 
 COLORS= [[166,206,227 ],[ 31,120,180 ],[ 178,223,138 ],[ 51,160,44 ],\
 [251,154,153 ],[ 227,26,28 ],[ 253,191,111 ],[ 255,127,0 ],\
