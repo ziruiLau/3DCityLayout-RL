@@ -1,4 +1,6 @@
 import argparse
+import copy
+
 import numpy as np
 import torch
 import os
@@ -46,7 +48,7 @@ def imitation_learning(agent, env, writer):
 
             env.reset_for_rl()
             s = env.render_gt_img(args.save_gt_img)
-            box = env.obs
+            box = copy.copy(env.obs)
             step = env.step_vec
             episode_count += 1
             acm_r = 0
@@ -60,6 +62,7 @@ def imitation_learning(agent, env, writer):
                 s_ = s
                 box_, step_, r, done = env.step_no_update(a)
                 # expert_action = env._action_to_direction[a]
+                # print('expert:', a,expert_action)
 
                 agent.memory_long.store(s, box, step, a, r, s_, box_, step_)
                 agent.memory_self.store(s, box, step, a, r, s_, box_, step_)
@@ -67,7 +70,9 @@ def imitation_learning(agent, env, writer):
                 # update the state
                 if episode != 0:
                     a = agent.choose_action(s, box, step, valid_mask, 1.0)
-                # real_action = env.action_map[a]
+                # real_action = env._action_to_direction[a]
+                # print('real:', a,  real_action)
+
                 box_, step_, r, done = env.step(a)
 
                 acm_r += r
@@ -81,7 +86,7 @@ def imitation_learning(agent, env, writer):
                     break
 
                 s = s_
-                box = box_
+                box = copy.copy(box_)
                 step = step_
 
             print('reward:', acm_r)
@@ -96,7 +101,7 @@ def reinforcement_learning_gym(agent, env, writer):
         print('Shape:', 0, 'RL epoch:', epoch)
         env.reset_for_rl()
         s = env.render_gt_img(args.save_gt_img)
-        box = env.obs
+        box = copy.copy(env.obs)
         step = env.step_vec
         episode_count += 1
         acm_r = 0
@@ -107,7 +112,7 @@ def reinforcement_learning_gym(agent, env, writer):
             a = agent.choose_action(s, box, step, valid_mask, p.EPSILON)
             box_, step_, r, done = env.step(a)
             s_ = s
-
+            # print('rl_action:', a, env._action_to_direction[a])
             agent.memory_self.store(s, box, step, a, r, s_, box_, step_)
 
             acm_r += r
@@ -122,7 +127,7 @@ def reinforcement_learning_gym(agent, env, writer):
                 break
 
             s = s_
-            box = box_
+            box = copy.copy(box_)
             step = step_
         print('reward:', acm_r)
         # if episode_count % save_net_f == 0:
