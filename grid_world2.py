@@ -6,6 +6,9 @@ import numpy as np
 from PIL import Image
 import copy
 import config
+import pickle
+import json
+import io
 
 # calculate iou
 import shapely.geometry
@@ -53,7 +56,7 @@ class GridWorldEnv(gym.Env):
         self.gt = np.zeros((self.size * self.size, 5), dtype=int)
         self.obs = np.zeros((self.size * self.size, 5), dtype=int)
 
-        self.action_num = self.size * self.size * 5 * 2
+        self.action_num = config.ACTION_NUM
         self.action_space = spaces.Discrete(self.action_num)
         self._action_to_direction = self.generate_actions_map()
 
@@ -68,7 +71,7 @@ class GridWorldEnv(gym.Env):
         action = 0
         for i in range(self.size * self.size):
             for j in range(5):
-                for k in [-1, 1]:
+                for k in [-1,1]:
                     action_maps[action] = np.array([i, j, k])
                     action += 1
 
@@ -364,9 +367,72 @@ class GridWorldEnv(gym.Env):
         )
         Image.fromarray(image).save(save_tmp_result_path + log_info + "-result-t.png")
 
-def close(self):
-        if self.window is not None:
-            pygame.display.quit()
-            pygame.quit()
 
+    def generate_data(self, mode):
+        num = 30 if mode == 'demo' else 300
+        path = 'demo' if mode == 'demo' else 'train'
+        for n in range(num):
+            for i in range(self.size*self.size):
+                r = i // self.size
+                c = i % self.size
+                r1 = random.randint(5, int(self.pix_square_size / 3))
+                r2 = random.randint(5, int(self.pix_square_size / 3))
+                x_t = int(self.pix_square_size * c) + r1
+                y_t = int(self.pix_square_size * r) + r2
+                self.gt[i][0] = x_t
+                self.gt[i][1] = y_t
+                self.gt[i][2] = random.randint(int(self.pix_square_size / 2) - 15, int(self.pix_square_size) - r1 - 10) + x_t
+                self.gt[i][3] = random.randint(int(self.pix_square_size / 2) - 15, int(self.pix_square_size) - r2 - 10) + y_t
+                self.gt[i][4] = random.randint(-10,10)
+
+            self.SCREEN.fill((255, 255, 255))
+            for i in range(self.size * self.size):
+                r = i // self.size
+                c = i % self.size
+                angle = self.gt[i][4]
+                surface = pygame.Surface((self.gt[i][2] - self.gt[i][0],
+                                          self.gt[i][3] - self.gt[i][1])
+                                         , pygame.SRCALPHA)
+                surface.fill((255, 0, 0))
+                rotated_surface = pygame.transform.rotate(surface, angle)
+                rect = rotated_surface.get_rect(center=(
+                    int((self.gt[i][0] + self.pix_square_size * (c + 1)) / 2),
+                    int((self.gt[i][1] + self.pix_square_size * (r + 1)) / 2),
+                ))
+                self.SCREEN.blit(rotated_surface, (rect.x, rect.y))
+
+            image = np.transpose(
+                np.array(pygame.surfarray.pixels3d(self.SCREEN)), axes=(1, 0, 2)
+            )
+            Image.fromarray(image).save('data/ref/' + path + '/'  + str(n) + ".png")
+
+            np.save('data/corr/' + path + '/' + str(n) + ".npy", self.gt)
+
+    def load_data(self, name, mode):
+        img = Image.open('data/ref/' + mode + '/'  + str(name) + ".png")
+        img = img.convert('L')
+        img = img.resize((128, 128), Image.ANTIALIAS)
+        raw_img = copy.copy(img)
+        img = np.array(img)
+        img = np.expand_dims(img, axis=0)
+        ref = img / 255.0
+
+        corr = np.load('data/corr/' + mode + '/' + str(name) + ".npy")
+
+        self.ref = ref
+        self.gt = corr
+
+        return self.ref, self.gt
+
+
+# def close(self):
+#         if self.window is not None:
+#             pygame.display.quit()
+#             pygame.quit()
+
+env = GridWorldEnv()
+env.reset()
+
+env.generate_data('demo')
+env.generate_data('train')
 
