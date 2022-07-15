@@ -57,7 +57,6 @@ class GridWorldEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self, size=8):
-        self.size = size  # The size of the square grid
         self.window_size = 400  # The size of the PyGame window
         self.size = config.SIZE
         self.max_step = config.MAX_STEP
