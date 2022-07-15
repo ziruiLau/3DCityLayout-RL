@@ -132,6 +132,7 @@ def reinforcement_learning_gym(agent, env, writer):
         #                save_net_path + 'target_RL_' + shape_ref_type + '_' + shape_category + '.pth')
 
 if __name__ == '__main__':
+    os.environ['SDL_VIDEODRIVER'] = 'dummy'
     args = parse_args()
 
     save_net_path = args.save_net
