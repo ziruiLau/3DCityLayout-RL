@@ -430,9 +430,9 @@ class GridWorldEnv(gym.Env):
 #             pygame.display.quit()
 #             pygame.quit()
 
-env = GridWorldEnv()
-env.reset()
-
-env.generate_data('demo')
-env.generate_data('train')
+# env = GridWorldEnv()
+# env.reset()
+#
+# env.generate_data('demo')
+# env.generate_data('train')
 
