@@ -369,7 +369,7 @@ class GridWorldEnv(gym.Env):
 
 
     def generate_data(self, mode):
-        num = 30 if mode == 'demo' else 300
+        num = config.DEMO_NUM if mode == 'demo' else config.TRAIN_NUM
         path = 'demo' if mode == 'demo' else 'train'
         for n in range(num):
             for i in range(self.size*self.size):

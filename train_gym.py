@@ -43,7 +43,7 @@ def imitation_learning(agent, env, writer):
     episode_count = 0
     for epoch in range(p.DAGGER_EPOCH):
 
-        for name in range(30):
+        for name in range(p.DEMO_NUM):
             # corr = 'data/corr/demo/' + str(name) + '.npy'
             # ref = 'data/ref/demo/' + str(name) + '.png'
             for episode in range(p.DAGGER_ITER):
@@ -101,7 +101,7 @@ def imitation_learning(agent, env, writer):
 def reinforcement_learning_gym(agent, env, writer):
     episode_count = 0
     for epoch in range(p.RL_EPOCH):
-        for name in range(300):
+        for name in range(p.TRAIN_NUM):
             print('Shape:', name, 'RL epoch:', epoch)
             env.reset_for_rl()
             s, target = env.load_data(name, 'train')
@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
 
     print('train il')
-    # imitation_learning(agent, gymenv, writer)
+    imitation_learning(agent, gymenv, writer)
     # torch.save(agent.eval_net.state_dict(), save_net_path+'eval_IL_'+ shape_ref_type + '_'+ shape_category + '.pth')
     # torch.save(agent.target_net.state_dict(),  save_net_path+'target_IL_'+ shape_ref_type + '_'+ shape_category + '.pth')
     agent.memory_self.clear()
