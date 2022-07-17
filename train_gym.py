@@ -19,7 +19,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Prim-Agent')
 
     parser.add_argument('--gpu', type=str, default='0', help='which gpu to use')
-    # parser.add_argument('--reference', type=str, default='depth', help='type of shape reference, rgb or depth image')
+    parser.add_argument('--reference', type=str, default='rgb', help='type of shape reference, rgb or depth image')
     # parser.add_argument('--category', type=str, default='airplane-02691156', help='category name, should be consistent with the name used in file path')
     parser.add_argument('--data_root', type=str, default='./data/', help='root directory of all the data')
 
@@ -31,7 +31,8 @@ def parse_args():
                         help='directory to save the training log (tensorboard)')
     parser.add_argument('--save_tmp_result', type=str, default='./tmp/',
                         help='directory to save the temporary results during training')
-
+    parser.add_argument('--load_net', type=str, default='./save_para/',
+                        help='directory to load the pre-trained network parameters')
     parser.add_argument('--save_gt_img', type=str, default='./gt_img/')
 
     args = parser.parse_args()
@@ -102,6 +103,7 @@ def reinforcement_learning_gym(agent, env, writer):
     episode_count = 0
     for epoch in range(p.RL_EPOCH):
         for name in range(p.TRAIN_NUM):
+        # for name in range(2):
             print('Shape:', name, 'RL epoch:', epoch)
             env.reset_for_rl()
             s, target = env.load_data(name, 'train')
@@ -143,6 +145,7 @@ if __name__ == '__main__':
     os.environ['SDL_VIDEODRIVER'] = 'dummy'
     args = parse_args()
 
+    shape_ref_type = args.reference
     save_net_path = args.save_net
     save_net_f = args.save_net_f
     save_log_path = args.save_log
@@ -162,12 +165,15 @@ if __name__ == '__main__':
 
     print('train il')
     imitation_learning(agent, gymenv, writer)
-    # torch.save(agent.eval_net.state_dict(), save_net_path+'eval_IL_'+ shape_ref_type + '_'+ shape_category + '.pth')
-    # torch.save(agent.target_net.state_dict(),  save_net_path+'target_IL_'+ shape_ref_type + '_'+ shape_category + '.pth')
+    torch.save(agent.eval_net.state_dict(), save_net_path+'eval_IL_'+ shape_ref_type + '_layout' + '.pth')
+    torch.save(agent.target_net.state_dict(),  save_net_path+'target_IL_'+ shape_ref_type + '_layout' + '.pth')
     agent.memory_self.clear()
+
+    # load_eval_net_path = args.load_net + 'eval_IL_rgb_layout.pth'
+    # load_target_net_path = args.load_net + 'target_IL_rgb_layout.pth'
+    # agent = Agent([load_eval_net_path, load_target_net_path])
 
     print('train rl')
     reinforcement_learning_gym(agent, gymenv, writer)
-    # torch.save(agent.eval_net.state_dict(), save_net_path + 'eval_RL_' + shape_ref_type + '_' + shape_category + '.pth')
-    # torch.save(agent.target_net.state_dict(),
-    #            save_net_path + 'target_RL_' + shape_ref_type + '_' + shape_category + '.pth')
+    torch.save(agent.eval_net.state_dict(), save_net_path+'eval_RL_'+ shape_ref_type + '_layout' + '.pth')
+    torch.save(agent.target_net.state_dict(),  save_net_path+'target_RL_'+ shape_ref_type + '_layout' + '.pth')

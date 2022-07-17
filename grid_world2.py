@@ -39,7 +39,7 @@ class GridWorldEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"]}
 
     def __init__(self, size=8):
-        self.window_size = 400  # The size of the PyGame window
+        self.window_size = config.WIN_SIZE  # The size of the PyGame window
         self.size = config.SIZE
         self.max_step = config.MAX_STEP
         self.step_count = 0
@@ -71,7 +71,7 @@ class GridWorldEnv(gym.Env):
         action = 0
         for i in range(self.size * self.size):
             for j in range(5):
-                for k in [-1,1]:
+                for k in [-3,-2, 2,3]:
                     action_maps[action] = np.array([i, j, k])
                     action += 1
 
@@ -84,6 +84,8 @@ class GridWorldEnv(gym.Env):
 
             i, j, k = self._action_to_direction[a]
             box_id = self.step_count % (self.size*self.size)
+            # box_id = random.randint(0, 4)
+
             # only edit an designated box
             if i != box_id:
                 valid_mask[a] = 0
@@ -190,14 +192,40 @@ class GridWorldEnv(gym.Env):
 
         return iou, local_iou
 
+    def compute_increment_try(self, try_box):
+        i_iou = 0
+        u_iou = 0
+        single_iou = 0
+
+        for i in range(self.size*self.size):
+            gt_b = RotatedRect(self.gt[i][0], self.gt[i][1],
+                               self.gt[i][2] - self.gt[i][0],
+                               self.gt[i][3] - self.gt[i][1], self.gt[i][4])
+            obs_b = RotatedRect(try_box[i][0], try_box[i][1],
+                               try_box[i][2] - try_box[i][0],
+                               try_box[i][3] - try_box[i][1], try_box[i][4])
+
+            ins = gt_b.intersection(obs_b).area
+
+            i_iou += ins
+            u_iou += gt_b.area() + obs_b.area() - ins
+            single_iou += ins / (gt_b.area() + obs_b.area() - ins)
+
+        iou = i_iou / u_iou
+        local_iou = single_iou / (self.size * self.size)
+        # local_iou = single_iou
+
+        return iou, local_iou
+
     def compute_reward(self, iou, local_iou):
 
         r_iou = iou - self.last_IOU
         r_local = local_iou - self.last_local_IOU
 
-        a = 0.1
+        a = 0.2
 
         reward = r_iou + a * r_local
+        # reward = r_iou
 
         return reward
 
@@ -304,7 +332,7 @@ class GridWorldEnv(gym.Env):
         j = direction[1]
         k = direction[2]
 
-        try_box = self.obs
+        try_box = copy.copy(self.obs)
         if j == 4:
             try_box[i][j] += k
         elif j == 0 | j == 1:
@@ -312,7 +340,7 @@ class GridWorldEnv(gym.Env):
         else:
             try_box[i][j] += k
 
-        IOU, local_IOU = self.compute_increment()
+        IOU, local_IOU = self.compute_increment_try(try_box)
         reward = self.compute_reward(IOU, local_IOU)
 
         try_step_vec = np.zeros((self.max_step), dtype=np.int)
@@ -324,7 +352,7 @@ class GridWorldEnv(gym.Env):
 
 
 
-        return self.obs, try_step_vec, reward, done
+        return try_box, try_step_vec, reward, done
 
     def output_result(self, log_info, save_tmp_result_path):
         self.SCREEN.fill((255, 255, 255))

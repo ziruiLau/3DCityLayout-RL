@@ -81,8 +81,8 @@ class Agent(object):
         self.eval_net, self.target_net = Net().cuda(), Net().cuda()
         
         if weights_path is not None:
-            self.eval_net.load_state_dict(torch.load(weights_path))
-            self.target_net.load_state_dict(torch.load(weights_path))
+            self.eval_net.load_state_dict(torch.load(weights_path[0]))
+            self.target_net.load_state_dict(torch.load(weights_path[1]))
         
         #the memory_self is shared by D_short in IL and D_self in RL
         self.memory_long = Memory(p.MEMORY_LONG_CAPACITY) 

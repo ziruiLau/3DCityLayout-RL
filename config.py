@@ -4,9 +4,9 @@ REF_IMG_RESO = 128
 
 SIZE = 2
 BOX_NUM=SIZE*SIZE
-ACTION_NUM=BOX_NUM*5*2
+ACTION_NUM=BOX_NUM*5*4
 LOOP_NUM=10
-MAX_STEP=300
+MAX_STEP=400
 
 # hyperparamters for training
 BATCH_SIZE = 64
@@ -14,15 +14,16 @@ LR = 0.00008                 # learning rate
 EPSILON = 0.98               # greedy policy
 GAMMA = 0.9                  # reward discount
 TARGET_REPLACE_ITER = 4000   # target update frequency
-MEMORY_LONG_CAPACITY = 200000
-MEMORY_SELF_CAPACITY = 100000 # shared by D_short and D_self
+MEMORY_LONG_CAPACITY = 20000
+MEMORY_SELF_CAPACITY = 10000 # shared by D_short and D_self
 DAGGER_EPOCH=1
 DAGGER_ITER=4
-DAGGER_LEARN=4000
+DAGGER_LEARN=2000
 RL_EPOCH=2000
 
-DEMO_NUM = 12
-TRAIN_NUM = 200
+DEMO_NUM = 30
+TRAIN_NUM = 300
+WIN_SIZE = 240
 
 COLORS= [[166,206,227 ],[ 31,120,180 ],[ 178,223,138 ],[ 51,160,44 ],\
 [251,154,153 ],[ 227,26,28 ],[ 253,191,111 ],[ 255,127,0 ],\
