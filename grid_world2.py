@@ -71,7 +71,7 @@ class GridWorldEnv(gym.Env):
         action = 0
         for i in range(self.size * self.size):
             for j in range(5):
-                for k in [-3,-2, 2,3]:
+                for k in [-2,-1, 1,2]:
                     action_maps[action] = np.array([i, j, k])
                     action += 1
 
@@ -459,8 +459,4 @@ class GridWorldEnv(gym.Env):
 #             pygame.quit()
 
 # env = GridWorldEnv()
-# env.reset()
-#
-# env.generate_data('demo')
-# env.generate_data('train')
 

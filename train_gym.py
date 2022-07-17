@@ -86,7 +86,7 @@ def imitation_learning(agent, env, writer):
                         # uncomment the following lines to output the intermediate results
                         # log_info = 'RL_' + str(epoch) + '_shape_' + str(1) + '_r_' + str(
                         #     format(acm_r, '.4f')) + '_' + 'shape'
-                        # env.output_result('il', save_tmp_result_path)
+                        env.output_result('il', save_tmp_result_path)
                         writer.add_scalar('Prim_RL/' + 'grid', acm_r, episode_count)
                         break
 
@@ -165,8 +165,8 @@ if __name__ == '__main__':
 
     print('train il')
     imitation_learning(agent, gymenv, writer)
-    torch.save(agent.eval_net.state_dict(), save_net_path+'eval_IL_'+ shape_ref_type + '_layout' + '.pth')
-    torch.save(agent.target_net.state_dict(),  save_net_path+'target_IL_'+ shape_ref_type + '_layout' + '.pth')
+    # torch.save(agent.eval_net.state_dict(), save_net_path+'eval_IL_'+ shape_ref_type + '_layout' + '.pth')
+    # torch.save(agent.target_net.state_dict(),  save_net_path+'target_IL_'+ shape_ref_type + '_layout' + '.pth')
     agent.memory_self.clear()
 
     # load_eval_net_path = args.load_net + 'eval_IL_rgb_layout.pth'
@@ -175,5 +175,5 @@ if __name__ == '__main__':
 
     print('train rl')
     reinforcement_learning_gym(agent, gymenv, writer)
-    torch.save(agent.eval_net.state_dict(), save_net_path+'eval_RL_'+ shape_ref_type + '_layout' + '.pth')
-    torch.save(agent.target_net.state_dict(),  save_net_path+'target_RL_'+ shape_ref_type + '_layout' + '.pth')
+    # torch.save(agent.eval_net.state_dict(), save_net_path+'eval_RL_'+ shape_ref_type + '_layout' + '.pth')
+    # torch.save(agent.target_net.state_dict(),  save_net_path+'target_RL_'+ shape_ref_type + '_layout' + '.pth')
